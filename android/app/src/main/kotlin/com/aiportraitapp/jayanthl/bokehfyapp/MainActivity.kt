@@ -13,6 +13,10 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions
+import com.google.firebase.ml.common.modeldownload.FirebaseModelManager
+import com.google.firebase.ml.common.modeldownload.FirebaseRemoteModel
+import com.google.firebase.ml.custom.*
 
 import io.flutter.app.FlutterActivity
 import io.flutter.plugin.common.MethodChannel
@@ -24,6 +28,7 @@ import org.opencv.core.Mat
 import org.opencv.core.Size
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
+import java.lang.reflect.Array
 
 class MainActivity: FlutterActivity() {
 
@@ -33,6 +38,29 @@ class MainActivity: FlutterActivity() {
         super.onCreate(savedInstanceState)
         GeneratedPluginRegistrant.registerWith(this)
 
+        var conditionsBuilder: FirebaseModelDownloadConditions.Builder = FirebaseModelDownloadConditions
+                .Builder()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            conditionsBuilder = conditionsBuilder.requireCharging().requireDeviceIdle()
+        }
+
+        val conditions = conditionsBuilder.build()
+
+        val cloudSourcePaint = FirebaseRemoteModel.Builder("paint_artist")
+                .enableModelUpdates(true)
+                .setUpdatesDownloadConditions(conditions)
+                .build()
+
+        FirebaseModelManager.getInstance().registerRemoteModel(cloudSourcePaint)
+        Log.i("TensorflowInit", "Paint Tensorflow model registered successfully")
+        FirebaseModelManager.getInstance().downloadRemoteModelIfNeeded(cloudSourcePaint)
+                .addOnSuccessListener {
+                    Log.i("TensorflowInit", "Paint model downloaded successfully")
+                }
+                .addOnFailureListener {
+                    Log.i("TensorflowInit", "Paint model couldn't de downloaded")
+                }
 
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
 

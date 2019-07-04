@@ -1,7 +1,10 @@
+import 'package:bokehfyapp/commons/utils/animation_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:bokehfyapp/commons/artist_images_list.dart';
+import 'package:provider/provider.dart';
 import 'package:vector_math/vector_math.dart' as vectormath;
 import 'package:bokehfyapp/commons/platform_channels/image_utils.dart';
+import 'package:bokehfyapp/providers/artist_provider.dart';
 
 class ArtistTemplateViewoute extends StatefulWidget {
 
@@ -13,8 +16,10 @@ class ArtistTemplateViewoute extends StatefulWidget {
 }
 
 class _ArtistTemplateViewouteState extends State<ArtistTemplateViewoute> {
+
   @override
   Widget build(BuildContext context) {
+    final artistAppState = Provider.of<ArtistProviderState>(context);
     return Scaffold(
       body: Container(
         child: Stack(
@@ -106,6 +111,9 @@ class _ArtistTemplateViewouteState extends State<ArtistTemplateViewoute> {
                                                 // open the dialog for image picking
                                                 ImageUtils().getGalleryImage().then((got_image) {
                                                   print("ImageUtilsGet: " + got_image.toString());
+
+                                                  // here subit for the artist ai
+                                                  artistAppState.submitForArtist(artistImagesList[widget.currentImage], got_image.toString());
                                                 }); 
                                               },
                                               child: Container(
@@ -124,7 +132,7 @@ class _ArtistTemplateViewouteState extends State<ArtistTemplateViewoute> {
                                           GestureDetector(
                                             onTap: () {
                                               Navigator.of(context).pop();
-                                              Navigator.of(context).pop();
+                                              // Navigator.of(context).pop();
                                               // open the dialog for image picking
 
                                               ImageUtils().getCameraImage().then((got_image) {
@@ -171,7 +179,7 @@ class _ArtistTemplateViewouteState extends State<ArtistTemplateViewoute> {
                   ),
                 )
               ],
-            )
+            ),
           ],
         ),
       ),
