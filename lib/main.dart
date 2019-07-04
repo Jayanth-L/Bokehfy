@@ -1,345 +1,342 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'main_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/services.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:bokehfyapp/routes/artist_template_view_route.dart';
+import 'commons/artist_images_list.dart';
 
-/**
- * author: Jayanrh L
- * email: jayanthl@protonmail.com
- */
+void main() => runApp(MyApp());
 
-void main() => runApp(MyBokehfyApp());
-
-class MyBokehfyApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Intro slider",
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Raleway"),
-      home: IntroSlider(),
+      theme: ThemeData(primarySwatch: Colors.blue),
+      darkTheme: ThemeData.light(),
+      home: MainPage(),
     );
   }
 }
 
-class IntroSlider extends StatefulWidget {
+class MainPage extends StatefulWidget {
   @override
-  _IntroSliderState createState() => _IntroSliderState();
+  _MainPageState createState() => _MainPageState();
 }
 
-class _IntroSliderState extends State<IntroSlider> {
-  static final platform = MethodChannel("BokehfyImage");
+class _MainPageState extends State<MainPage> {
 
-  bool _isTheAppFirstTime;
-  var pages = [Page1(), Page2(), Page3()];
-
-  var _isPageVisible = true;
-  var _currentPage = 0;
-
-  var _isNextButtonEnabled = true;
+  var numberOfPaintImages = artistImagesList.length;
+  var currentPage;
+  var artistPageAfterChanged = 10;
 
   @override
   void initState() {
+    currentPage = numberOfPaintImages.toDouble() - 1.0;
     super.initState();
-    _isFirstTimeAndPermission().then((_) {
-      if (_ == "true") {
-        setState(() {
-          this._isTheAppFirstTime = true;
-        });
-      } else {
-        setState(() {
-          _isTheAppFirstTime = false;
-        });
-      }
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    PageController controller = PageController(initialPage: 10);
+    controller.addListener(() {
+      setState(() {
+        currentPage = controller.page;
+      });
     });
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    if (_isTheAppFirstTime == null) {
-      return Container(
-        color: Colors.white,
-      );
-    } else if (_isTheAppFirstTime) {
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: Text(
-            "BOKEHFY",
-            style: TextStyle(color: Colors.black),
-          ),
-          centerTitle: true,
-          elevation: 0.0,
-        ),
-        backgroundColor: Colors.white,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  color: Colors.white,
-                  child: AnimatedOpacity(
-                      duration: Duration(seconds: 1),
-                      opacity: _isPageVisible ? 1.0 : 0.0,
-                      child: pages[_currentPage]),
-                ),
+    return Scaffold(
+      //backgroundColor: Color(0xFF2d3447),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 12.0, right: 12.0, top: 30.0, bottom: 8.0
               ),
-              Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  MaterialButton(
-                    child: Icon(Icons.arrow_back_ios),
-                    onPressed: () {
-                      print("Pressed current page");
-                      if (_currentPage > 0) {
-                        setState(() {
-                          _isPageVisible = false;
-                          Future.delayed(Duration(seconds: 1), () {
-                            setState(() {
-                              _currentPage = _currentPage - 1;
-                              _isPageVisible = true;
-                            });
-                          });
-                        });
-                      }
-                      print("going back");
-                    },
+                  IconButton(
+                    icon: Icon(
+                      Icons.menu,
+                      size: 30.0,
+                    ),
+                    onPressed: () {},
                   ),
-                  MaterialButton(
-                    child: Icon(Icons.send),
-                    onPressed: () {
-                      if (_isNextButtonEnabled) {
-                        _isNextButtonEnabled = false;
-                        if (_currentPage == 1) {
-                          _checkPermission().then((_) {
-                            if (_ == "true") {
-                              setState(() {
-                                _isPageVisible = false;
-                                Future.delayed(Duration(seconds: 1), () {
-                                  setState(() {
-                                    _currentPage = _currentPage + 1;
-                                    _isPageVisible = true;
-                                    _isNextButtonEnabled = true;
-                                  });
-                                });
-                              }
-                              
-                              );} else {
-                                _isNextButtonEnabled = true;
-                              }
-                          });
-                        } else if (_currentPage < 2) {
-                          setState(() {
-                            _isPageVisible = false;
-                            Future.delayed(Duration(seconds: 1), () {
-                              setState(() {
-                                _currentPage = _currentPage + 1;
-                                _isPageVisible = true;
-                                _isNextButtonEnabled = true;
-                              });
-                            });
-                          });
-                        } else {
-                          _setTheInitFlag().then((_) {
-                            showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (BuildContext progressContext) {
-                                  _decryptTensorflowModel().then((_) {
-                                    if (_ == "success") {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  BokehfyApp()));
-                                    }
-                                  });
-                                  return Center(
-                                      child: Container(
-                                    child: CircularProgressIndicator(),
-                                    width: 50.0,
-                                    height: 50.0,
-                                  ));
-                                });
-                          });
-                        }
-                        print("Pressed");
-                      }
-                    },
-                  )
                 ],
-              )
-            ],
-          ),
-        ),
-      );
-    } else {
-      return BokehfyApp();
-    }
-  }
-
-  Future<String> _decryptTensorflowModel() async {
-    var res = await platform
-        .invokeMethod("decryptTensorflowModel", {"decrypt": "decrypt"});
-    return res;
-  }
-
-  Future<String> _checkPermission() async {
-    var res = await platform
-        .invokeMethod('checkStoragePermission', {"check": "check"});
-    return res;
-  }
-
-  Future<String> _isFirstTimeAndPermission() async {
-
-    // implementing the below with the native code
-
-    var firstTime = await platform.invokeMethod("isFirstTimeAndCheckPermission", {"firstpermission": "firstpermission"});
-    return firstTime;
-
-    /*
-    bool firstTime;
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    bool notFirst = _preferences.getBool('first') ?? false;
-    if (notFirst) {
-      print("not first time");
-      firstTime = false;
-    } else {
-      print('firstTime');
-      firstTime = true;
-    }
-    return firstTime; */
-  }
-
-  Future<String> _setTheInitFlag() async {
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    await _preferences.setBool('first', true);
-    await _preferences.commit();
-    return "done";
-  }
-}
-
-class Page1 extends StatefulWidget {
-  @override
-  _Page1State createState() => _Page1State();
-}
-
-class _Page1State extends State<Page1> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(Icons.photo_filter, size: 100.0, color: Colors.black),
-            Text(
-              "BOKEHFY APP",
-              style: TextStyle(fontSize: 17.0, color: Colors.black),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class Page2 extends StatefulWidget {
-  @override
-  _Page2State createState() => _Page2State();
-}
-
-class _Page2State extends State<Page2> {
-  static final platform = MethodChannel("BokehfyImage");
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(Icons.supervisor_account, size: 100.0, color: Colors.black),
-            Text(
-              "Magically convert to Portrait photos with AI",
-              style: TextStyle(
-                fontSize: 17.0,
-                color: Colors.black,
               ),
             ),
-            RaisedButton(
-              child: Text(
-                "Give Permission",
-                style: TextStyle(color: Colors.black),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text("Bokehfy", style: TextStyle(
+                    fontSize: 46.0,
+                    letterSpacing: 1.0
+                  ),),
+                  IconButton(
+                    icon: Icon(Icons.donut_large, size: 24.0),
+                    onPressed: () {},
+                  )
+                ],
               ),
-              elevation: 5.0,
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    barrierDismissible: false,
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 20.0),
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xFFff6e6e),
+                      borderRadius: BorderRadius.circular(20.0)
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22.0, vertical: 6.0
+                        ),
+                        child: Text("Paint Artist", style: TextStyle(color: Colors.white),),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 15.0,),
+                  Text("5+ templates!", style: TextStyle(color: Colors.blueAccent),)
+                ],
+              ),
+            ),
+            Container(
+              height: 30,
+              width: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.0),
+                color: Colors.blueAccent
+              ),
+              child: Center(child: Text("New Feature!!!", style: TextStyle(color: Colors.white),)),
+            ),
+
+            GestureDetector(
+              onTap: () {
+                print("tapped: $currentPage");
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => ArtistTemplateViewoute(currentImage: artistPageAfterChanged,)
+                  )
+                );
+              } ,
+              child: Stack(
+                children: <Widget>[
+                  CardScrollWidget(currentPage),
+                  Positioned.fill(
+                    child: PageView.builder(
+                      onPageChanged: (page) {
+                        print("Page changed: $page");
+                        artistPageAfterChanged = page;
+                      },
+                      itemCount: numberOfPaintImages,
+                      controller: controller,
+                      reverse: true,
+                      itemBuilder: (context, index) {
+                        return Container();
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text("Portrait Mode", style: TextStyle(
+                    fontSize: 30.0,
+                    letterSpacing: 1.0
+                  ),),
+                  IconButton(
+                    icon: Icon(Icons.donut_large, size: 24.0),
+                    onPressed: () {},
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 20.0),
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(20.0)
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22.0, vertical: 6.0
+                        ),
+                        child: Text("Bokeh pics", style: TextStyle(color: Colors.white),),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 15.0,),
+                  Text("25+ Stories", style: TextStyle(color: Colors.blueAccent),)
+                ],
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: CarouselSlider(
+                height: 200.0,
+                aspectRatio: 16/9,
+                viewportFraction: 0.8,
+                enableInfiniteScroll: false,
+                autoPlay: true,
+                autoPlayInterval: Duration(seconds: 1),
+                autoPlayCurve: Curves.fastOutSlowIn,
+                enlargeCenterPage: true,
+                items: [1, 2].map((i) {
+                  return Builder(
                     builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Storage Permission"),
-                        content: Text(
-                            "We need storage permission to be able to write images to disk"),
-                        actions: <Widget>[
-                          MaterialButton(
-                            child: Text("No"),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          RaisedButton(
-                            child: Text(
-                              "Yes",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onPressed: () {
-                              _getStoragePermission();
-                              Navigator.of(context).pop();
-                            },
-                          )
-                        ],
+                      return Container(
+                    
+                        width: MediaQuery.of(context).size.width / 2 + 60,
+                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        decoration: BoxDecoration(
+                          color: Colors.amber
+                        ),
+                        child: Text("position"),
                       );
-                    });
-              },
-            )
+                    },
+                  );
+                }).toList()
+              ),
+            ),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
+            Text("Appam", style: TextStyle(fontSize: 30.0),),
           ],
         ),
       ),
     );
   }
-
-  Future<String> _getStoragePermission() async {
-    var res = await platform
-        .invokeMethod("getStoragePermission", {"permission": "permission"});
-    return res;
-  }
 }
 
-class Page3 extends StatefulWidget {
-  @override
-  _Page3State createState() => _Page3State();
-}
+var cardAspectRatio = 12.0 / 16.0;
+var widgetAspectratio = cardAspectRatio * 1.19;
 
-class _Page3State extends State<Page3> {
+class CardScrollWidget extends StatelessWidget {
+
+  var currentPage;
+  var padding = 20.0;
+  var verticalInset = 20.0;
+
+  var numberOfPaintImages = artistImagesList.length;
+  CardScrollWidget(this.currentPage);
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(Icons.face, size: 100.0, color: Colors.black),
-            Text(
-              "Happy Bokehfying!!!",
-              style: TextStyle(fontSize: 17.0, color: Colors.black),
-            )
-          ],
-        ),
+    return AspectRatio(
+      aspectRatio: widgetAspectratio,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          var width = constraints.maxWidth;
+          var height = constraints.maxHeight;
+
+          var safeWidth = width - 2 * padding;
+          var safeHeight = height - 2 * padding;
+
+          var heightOfPrimaryCard = safeHeight;
+          var widthOfPrimaryCard = heightOfPrimaryCard * cardAspectRatio;
+
+          var primaryCardLeft = safeWidth - widthOfPrimaryCard;
+          var horizontalInset = primaryCardLeft / 2;
+
+
+          List<Widget> cardList = List();
+
+          for (var i=0; i < numberOfPaintImages;  i++) {
+            var delta = i - currentPage;
+            bool isOnRight = delta > 0;
+
+            var start = padding + max(primaryCardLeft - horizontalInset * -delta * (isOnRight ? 15 : 1), 0.0);
+            
+            var image;
+            if(i%2 == 0) {
+              image = DecorationImage(image: ExactAssetImage("assets/artist/paint.jpg"), fit: BoxFit.cover);
+            } else {
+              image = DecorationImage(image: ExactAssetImage("assets/artist/notre.jpg"), fit: BoxFit.cover);
+            }
+
+            var cardItem = Positioned.directional(
+              top: padding + verticalInset * max(-delta, 0.0),
+              bottom: padding * verticalInset * max(-delta, 0.0),
+              start: start,
+              textDirection:  TextDirection.rtl,
+              child: Hero(
+                tag: "artist_$i",
+                child: AspectRatio(
+                  aspectRatio: cardAspectRatio,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: <Widget>[
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                          image: DecorationImage(
+                            image: ExactAssetImage(artistImagesList[i]),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                          gradient: LinearGradient(
+                            colors: [Colors.transparent, Colors.black54],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+            cardList.add(cardItem); 
+          }
+
+          return Stack(
+            children: cardList,
+          );
+        },
       ),
     );
   }
