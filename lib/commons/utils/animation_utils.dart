@@ -13,34 +13,45 @@ class _ProgressAnimationState extends State<ProgressAnimation> {
   Widget build(BuildContext context) {
     final artistProviderState = Provider.of<ArtistProviderState>(context);
 
-    artistProviderState.addListener(() {});
-
     var shouldOpenImageViewer = false;
 
-    SchedulerBinding.instance.scheduleFrameCallback((_) {
-      shouldOpenImageViewer = false;
-      if(shouldOpenImageViewer) {
-          Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) => Temp()
-          )
-        );
-      }
-    });
 
     if(artistProviderState.getProgress == "processing") {
       return Container(
-        color: Colors.transparent,
+        color: Colors.transparent.withOpacity(0.6),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: Center(child: Text("Hello appam",),),
+        child: Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width/2,
+            height: MediaQuery.of(context).size.height/2,
+            color: Colors.white,
+            child: Center(child: Text("Hello Appam"),),
+          ),
+        )
       );
     } else {
       if(artistProviderState.getProgress == "finished") {
         artistProviderState.resetProgress();
         shouldOpenImageViewer = true;
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          _openNextPage();
+        });
       }
       return Container();
+    }
+  }
+
+  Future _openNextPage() async {
+    while(true) {
+      try {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (BuildContext context) => Temp()
+          )
+        );
+        break;
+      } catch (e, s) {}
     }
   }
 }

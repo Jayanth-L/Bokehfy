@@ -62,7 +62,8 @@ class _MainPageState extends State<MainPage> {
     
 
     return Scaffold(
-      //backgroundColor: Color(0xFF2d3447),
+      // backgroundColor: Color(0xFF2d3447),
+      // backgroundColor: Colors.black,
       body: Stack(
         children: <Widget>[
           SingleChildScrollView(
@@ -120,7 +121,7 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                       SizedBox(width: 15.0,),
-                      Text("5+ templates!", style: TextStyle(color: Colors.blueAccent),)
+                      Text("5+ textures!", style: TextStyle(color: Colors.blueAccent),)
                     ],
                   ),
                 ),
@@ -262,7 +263,13 @@ class _MainPageState extends State<MainPage> {
               ],
             ),
           ),
-          Center(child: ProgressAnimation(),)
+          Consumer<ArtistProviderState>(
+            builder: (context, data, _) {
+              print("Data" + data.toString());
+
+              return  Center(child: ProgressAnimation());
+            },
+          )
         ],
       ),
     );

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bokehfyapp/commons/utils/animation_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:bokehfyapp/commons/artist_images_list.dart';
@@ -113,7 +115,9 @@ class _ArtistTemplateViewouteState extends State<ArtistTemplateViewoute> {
                                                   print("ImageUtilsGet: " + got_image.toString());
 
                                                   // here subit for the artist ai
-                                                  artistAppState.submitForArtist(artistImagesList[widget.currentImage], got_image.toString());
+                                                  if(got_image != null) {
+                                                    artistAppState.submitForArtist(artistImagesList[widget.currentImage], got_image.path.toString());
+                                                  }
                                                 }); 
                                               },
                                               child: Container(
@@ -132,11 +136,15 @@ class _ArtistTemplateViewouteState extends State<ArtistTemplateViewoute> {
                                           GestureDetector(
                                             onTap: () {
                                               Navigator.of(context).pop();
-                                              // Navigator.of(context).pop();
+                                              Navigator.of(context).pop();
                                               // open the dialog for image picking
 
                                               ImageUtils().getCameraImage().then((got_image) {
                                                   print("ImageUtilsGet: " + got_image.toString());
+
+                                                  if(got_image != null) {
+                                                    artistAppState.submitForArtist(artistImagesList[widget.currentImage], got_image.path.toString());
+                                                  }
                                               });
                                             },
                                             child: Container(
