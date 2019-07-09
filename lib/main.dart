@@ -220,63 +220,122 @@ class _MainPageState extends State<MainPage> {
                 ),
 
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    Container(
-                      height: 90.0,
-                      width: (MediaQuery.of(context).size.width - 30.0) / 2,
-                      child: Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: GestureDetector(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Colors.blue, Colors.green]
-                              ),
-                              borderRadius: BorderRadius.circular(10.0)
+                    Padding(
+                      padding: EdgeInsets.only(right: 30.0, bottom: 30.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          showGeneralDialog(
+                            context: context,
+                            pageBuilder: (context, animation1, animation2) {},
+                            barrierDismissible: true,
+                            barrierColor: Colors.black.withOpacity(0.4),
+                            barrierLabel: "",
+                            transitionBuilder: (context, animation1, animation2, child) {
+                              return Transform.scale(
+                                scale: animation1.value,
+                                child: Opacity(
+                                  opacity: animation1.value,
+                                  child: Dialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    elevation: 0.0,
+                                    backgroundColor: Colors.transparent,
+                                    child: SafeArea(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12.0),
+                                          color: Colors.white
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: <Widget>[
+                                              Text("Select source", style: TextStyle(fontSize: 20.0)),
+                                              Padding(
+                                                padding: const EdgeInsets.all(30.0),
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    //Navigator.of(context).pop();
+                                                    Navigator.of(context).pop();
+                                                    // open the dialog for image picking
+                                                    ImageUtils().getGalleryImage().then((gotImage) {
+                                                      print("ImageUtilsGet: " + gotImage.toString());
+
+                                                      if(gotImage != null) {
+                                                        artistAppState.submitForBokehfy(gotImage.path, "bokehfy", "gallery");
+                                                      }
+                                                    }); 
+                                                  },
+                                                  child: Container(
+                                                    width: MediaQuery.of(context).size.width / 2,
+                                                    height: 50,
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        colors: [Colors.blue, Colors.green],
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(30.0)
+                                                    ),
+                                                    child: Center(child: Icon(Icons.image_aspect_ratio, color: Colors.white,))
+                                                  ),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  //Navigator.of(context).pop();
+                                                  Navigator.of(context).pop();
+                                                  // open the dialog for image picking
+
+                                                  ImageUtils().getCameraImage().then((gotImage) {
+                                                      print("ImageUtilsGet: " + gotImage.toString());
+
+                                                     if(gotImage != null) {
+                                                        artistAppState.submitForBokehfy(gotImage.path, "bokehfy", "camera");
+                                                      }
+                                                  });
+                                                },
+                                                child: Container(
+                                                  width: MediaQuery.of(context).size.width / 2,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                      colors: [Colors.blue, Colors.green],
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(30.0)
+                                                  ),
+                                                  child: Center(child: Icon(Icons.camera, color: Colors.white,))
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        width: MediaQuery.of(context).size.width - 100,
+                                        height: MediaQuery.of(context).size.height - 500,
+                                      ),
+                                    ),
+                                  )
+                                ),
+                              );
+                            },
+                            transitionDuration: Duration(milliseconds: 150)
+                          );
+                        },
+                        child: Container(
+                          width: 100,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.blue, Colors.green],
                             ),
-                            child: Center(
-                              child: Icon(Icons.add_a_photo, color: Colors.white, size: 30.0,),
-                            ),
+                            borderRadius: BorderRadius.all(Radius.circular((30.0)))
                           ),
-                          onTap: () {
-                            ImageUtils().getGalleryImage().then((gotImage) {
-                              if(gotImage != null) {
-                                artistAppState.submitForBokehfy(gotImage.path, "bokehfy", "gallery");
-                              }
-                            });
-                          },
+                          child: Center(child: Text("Use", style: TextStyle(color: Colors.white),)),
                         ),
                       ),
                     ),
-
-                    Container(
-                      height: 90.0,
-                      width: (MediaQuery.of(context).size.width - 30.0) / 2,
-                      child: Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: GestureDetector(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0),
-                              gradient: LinearGradient(
-                                colors: [Colors.red, Colors.amber],
-                              )
-                            ),
-                            child: Center(
-                              child: Icon(Icons.camera, color: Colors.white, size: 30.0,),
-                            ),
-                          ),
-                          onTap: () {
-                            ImageUtils().getCameraImage().then((gotImage) {
-                              if(gotImage != null) {
-                                artistAppState.submitForBokehfy(gotImage.path, "bokehfy", "camera");
-                              }
-                            });
-                          }
-                        ),
-                      ),
-                    )
                   ],
                 ),
 
@@ -398,63 +457,122 @@ class _MainPageState extends State<MainPage> {
                 ),
 
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    Container(
-                      height: 90.0,
-                      width: (MediaQuery.of(context).size.width - 30.0) / 2,
-                      child: Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: GestureDetector(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Colors.red, Colors.amber]
-                              ),
-                              borderRadius: BorderRadius.circular(10.0)
+                    Padding(
+                      padding: EdgeInsets.only(right: 30.0, bottom: 30.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          showGeneralDialog(
+                            context: context,
+                            pageBuilder: (context, animation1, animation2) {},
+                            barrierDismissible: true,
+                            barrierColor: Colors.black.withOpacity(0.4),
+                            barrierLabel: "",
+                            transitionBuilder: (context, animation1, animation2, child) {
+                              return Transform.scale(
+                                scale: animation1.value,
+                                child: Opacity(
+                                  opacity: animation1.value,
+                                  child: Dialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    elevation: 0.0,
+                                    backgroundColor: Colors.transparent,
+                                    child: SafeArea(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12.0),
+                                          color: Colors.white
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: <Widget>[
+                                              Text("Select source", style: TextStyle(fontSize: 20.0)),
+                                              Padding(
+                                                padding: const EdgeInsets.all(30.0),
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    //Navigator.of(context).pop();
+                                                    Navigator.of(context).pop();
+                                                    // open the dialog for image picking
+                                                    ImageUtils().getGalleryImage().then((gotImage) {
+                                                      print("ImageUtilsGet: " + gotImage.toString());
+
+                                                      if(gotImage != null) {
+                                                        artistAppState.submitForBokehfy(gotImage.path, "chromy", "gallery");
+                                                      }
+                                                    }); 
+                                                  },
+                                                  child: Container(
+                                                    width: MediaQuery.of(context).size.width / 2,
+                                                    height: 50,
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        colors: [Colors.blue, Colors.green],
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(30.0)
+                                                    ),
+                                                    child: Center(child: Icon(Icons.image_aspect_ratio, color: Colors.white,))
+                                                  ),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  //Navigator.of(context).pop();
+                                                  Navigator.of(context).pop();
+                                                  // open the dialog for image picking
+
+                                                  ImageUtils().getCameraImage().then((gotImage) {
+                                                      print("ImageUtilsGet: " + gotImage.toString());
+
+                                                      if(gotImage != null) {
+                                                        artistAppState.submitForBokehfy(gotImage.path, "chromy", "camera");
+                                                      }
+                                                  });
+                                                },
+                                                child: Container(
+                                                  width: MediaQuery.of(context).size.width / 2,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                      colors: [Colors.blue, Colors.green],
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(30.0)
+                                                  ),
+                                                  child: Center(child: Icon(Icons.camera, color: Colors.white,))
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        width: MediaQuery.of(context).size.width - 100,
+                                        height: MediaQuery.of(context).size.height - 500,
+                                      ),
+                                    ),
+                                  )
+                                ),
+                              );
+                            },
+                            transitionDuration: Duration(milliseconds: 150)
+                          );
+                        },
+                        child: Container(
+                          width: 100,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.red, Colors.amber],
                             ),
-                            child: Center(
-                              child: Icon(Icons.add_a_photo, color: Colors.white, size: 30.0,),
-                            ),
+                            borderRadius: BorderRadius.all(Radius.circular((30.0)))
                           ),
-                          onTap: () {
-                            ImageUtils().getGalleryImage().then((gotImage) {
-                              if(gotImage != null) {
-                                artistAppState.submitForBokehfy(gotImage.path, "chromy", "gallery");
-                              }
-                            });
-                          },
+                          child: Center(child: Text("Use", style: TextStyle(color: Colors.white),)),
                         ),
                       ),
                     ),
-
-                    Container(
-                      height: 90.0,
-                      width: (MediaQuery.of(context).size.width - 30.0) / 2,
-                      child: Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: GestureDetector(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0),
-                              gradient: LinearGradient(
-                                colors: [Colors.blue, Colors.green],
-                              )
-                            ),
-                            child: Center(
-                              child: Icon(Icons.camera, color: Colors.white, size: 30.0,),
-                            ),
-                          ),
-                          onTap: () {
-                            ImageUtils().getCameraImage().then((gotImage) {
-                              if(gotImage != null) {
-                                artistAppState.submitForBokehfy(gotImage.path, "chromy", "camera");
-                              }
-                            });
-                          }
-                        ),
-                      ),
-                    )
                   ],
                 ),
 

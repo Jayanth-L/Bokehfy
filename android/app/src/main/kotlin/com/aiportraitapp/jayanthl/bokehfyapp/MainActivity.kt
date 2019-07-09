@@ -49,7 +49,15 @@ class MainActivity: FlutterActivity() {
             if(methodCall.method.equals("aiArtist")) {
                 val imagePath = arguments.get("image_path").toString()
                 val aiTexture = arguments.get("ai_template").toString()
-                ArtistAI(this).aiArtistConvert(imagePath, aiTexture, result)
+                AsyncHandler({
+                    try {
+                        ArtistAI(this).aiArtistConvert(imagePath, aiTexture, result)
+                        return@AsyncHandler true
+
+                    } catch (e: java.lang.Exception) {
+                        return@AsyncHandler false
+                    }
+                }, this, result).execute()
             }
 
             else if(methodCall.method.equals("aiBokehfy")) {
@@ -58,9 +66,26 @@ class MainActivity: FlutterActivity() {
                 val aiSource = arguments.get("ai_source").toString()
 
                 if(aiType == "bokehfy") {
-                    BokehfyAI(this).aiConvertToPortrait(imagePath, result, aiSource)
+                    AsyncHandler({
+                        try {
+                            BokehfyAI(this).aiConvertToPortrait(imagePath, result, aiSource)
+                            return@AsyncHandler true
+
+                        } catch (e: java.lang.Exception) {
+                            return@AsyncHandler false
+                        }
+                    }, this, result).execute()
+
                 } else if(aiType == "chromy") {
-                    BokehfyAI(this).aiConvertToChrome(imagePath, result, aiSource)
+                    AsyncHandler({
+                        try {
+                            BokehfyAI(this).aiConvertToChrome(imagePath, result, aiSource)
+                            return@AsyncHandler true
+
+                        } catch (e: java.lang.Exception) {
+                            return@AsyncHandler false
+                        }
+                    }, this, result).execute()
                 }
             }
 
