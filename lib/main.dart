@@ -1,12 +1,21 @@
 import 'dart:math';
+import 'package:bokehfyapp/commons/final_gallery_image_viewers/all_chromy_viewer.dart';
+import 'package:bokehfyapp/commons/final_gallery_image_viewers/chromy_camera_viewer.dart';
+import 'package:bokehfyapp/commons/final_gallery_image_viewers/chromy_image_viewer.dart';
+import 'package:bokehfyapp/commons/platform_channels/image_utils.dart';
+import 'package:bokehfyapp/commons/platform_channels/platform_channels.dart';
 import 'package:bokehfyapp/providers/artist_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:bokehfyapp/routes/artist_template_view_route.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'commons/artist_images_list.dart';
 import 'commons/utils/animation_utils.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:bokehfyapp/commons/display_images_list_data.dart';
+import 'commons/final_gallery_image_viewers/portrait_image_viewer.dart';
+import 'commons/final_gallery_image_viewers/portrait_camera_viewer.dart';
+import 'commons/final_gallery_image_viewers/all_portrait_viewer.dart';
 
 void main() => runApp(MyApp());
 
@@ -40,6 +49,9 @@ class _MainPageState extends State<MainPage> {
   var currentPage;
   var artistPageAfterChanged = 10;
 
+  // misc
+  var bokehfyImagePosition = 0;
+  var chromifyImagePosition = 0;
 
   @override
   void initState() {
@@ -58,6 +70,9 @@ class _MainPageState extends State<MainPage> {
         currentPage = controller.page;
       });
     });
+
+    final artistAppState = Provider.of<ArtistProviderState>(context);
+
 
     
 
@@ -204,34 +219,320 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ),
 
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      height: 90.0,
+                      width: (MediaQuery.of(context).size.width - 30.0) / 2,
+                      child: Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: GestureDetector(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.blue, Colors.green]
+                              ),
+                              borderRadius: BorderRadius.circular(10.0)
+                            ),
+                            child: Center(
+                              child: Icon(Icons.add_a_photo, color: Colors.white, size: 30.0,),
+                            ),
+                          ),
+                          onTap: () {
+                            ImageUtils().getGalleryImage().then((gotImage) {
+                              if(gotImage != null) {
+                                artistAppState.submitForBokehfy(gotImage.path, "bokehfy", "gallery");
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+
+                    Container(
+                      height: 90.0,
+                      width: (MediaQuery.of(context).size.width - 30.0) / 2,
+                      child: Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: GestureDetector(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              gradient: LinearGradient(
+                                colors: [Colors.red, Colors.amber],
+                              )
+                            ),
+                            child: Center(
+                              child: Icon(Icons.camera, color: Colors.white, size: 30.0,),
+                            ),
+                          ),
+                          onTap: () {
+                            ImageUtils().getCameraImage().then((gotImage) {
+                              if(gotImage != null) {
+                                artistAppState.submitForBokehfy(gotImage.path, "bokehfy", "camera");
+                              }
+                            });
+                          }
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+
                 Padding(
                   padding: const EdgeInsets.all(20.0),
-                  child: CarouselSlider(
-                    height: 200.0,
-                    aspectRatio: 16/9,
-                    viewportFraction: 0.8,
-                    enableInfiniteScroll: false,
-                    autoPlay: true,
-                    autoPlayInterval: Duration(seconds: 1),
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: true,
-                    items: [1, 2].map((i) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Container(
-                        
-                            width: MediaQuery.of(context).size.width / 2 + 60,
-                            margin: EdgeInsets.symmetric(horizontal: 5.0),
-                            decoration: BoxDecoration(
-                              color: Colors.amber
-                            ),
-                            child: Text("position"),
-                          );
-                        },
-                      );
-                    }).toList()
+                  child: GestureDetector(
+                    onTap: () {
+                      print("Tapped on current: ${bokehfyImagePosition}");
+                      var nextRoute;
+                      if(bokehfyImagePosition == 0) {
+                        nextRoute = PortraitImageViewPage();
+                      } else if(bokehfyImagePosition == 1) {
+                        nextRoute = PortraitCameraViewPage();
+                      } else {
+                        nextRoute = AllPortraitViewer();
+                      }
+                      Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => nextRoute
+                          )
+                        );
+                    },
+                    child: CarouselSlider(
+                      height: 200.0,
+                      aspectRatio: 16/9,
+                      autoPlayAnimationDuration: Duration(milliseconds: 500),
+                      viewportFraction: 0.8,
+                      enableInfiniteScroll: false,
+                      autoPlay: false,
+                      autoPlayInterval: Duration(seconds: 4),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      enlargeCenterPage: true,
+                      onPageChanged: (_) {
+                        print("changed image: ${_}");
+                        bokehfyImagePosition = _;
+                      },
+                      items: [0, 1, 2].map((i) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return Stack(
+                              children: <Widget>[
+                                Container(
+                                  width: MediaQuery.of(context).size.width / 2 + 60,
+                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    image: DecorationImage(image: ExactAssetImage(bokehfyListImages[i]), fit: BoxFit.fill)
+                                  )
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width / 2 + 60,
+                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    gradient: LinearGradient(
+                                      colors: [Colors.transparent, Colors.black45],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter
+                                    )
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 12.0, bottom: 12.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(bokehfyListImagesInfo[i], style: TextStyle(color: Colors.white70),)
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ],
+                            );
+                          },
+                        );
+                      }).toList()
+                    ),
                   ),
                 ),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text("Chromy Mode", style: TextStyle(
+                        fontSize: 30.0,
+                        letterSpacing: 1.0
+                      ),),
+                      IconButton(
+                        icon: Icon(Icons.donut_large, size: 24.0),
+                        onPressed: () {},
+                      )
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20.0),
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(20.0)
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 22.0, vertical: 6.0
+                            ),
+                            child: Text("Chromy pics", style: TextStyle(color: Colors.white),),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 15.0,),
+                      Text("25+ Stories", style: TextStyle(color: Colors.blueAccent),)
+                    ],
+                  ),
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      height: 90.0,
+                      width: (MediaQuery.of(context).size.width - 30.0) / 2,
+                      child: Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: GestureDetector(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.red, Colors.amber]
+                              ),
+                              borderRadius: BorderRadius.circular(10.0)
+                            ),
+                            child: Center(
+                              child: Icon(Icons.add_a_photo, color: Colors.white, size: 30.0,),
+                            ),
+                          ),
+                          onTap: () {
+                            ImageUtils().getGalleryImage().then((gotImage) {
+                              if(gotImage != null) {
+                                artistAppState.submitForBokehfy(gotImage.path, "chromy", "gallery");
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+
+                    Container(
+                      height: 90.0,
+                      width: (MediaQuery.of(context).size.width - 30.0) / 2,
+                      child: Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: GestureDetector(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              gradient: LinearGradient(
+                                colors: [Colors.blue, Colors.green],
+                              )
+                            ),
+                            child: Center(
+                              child: Icon(Icons.camera, color: Colors.white, size: 30.0,),
+                            ),
+                          ),
+                          onTap: () {
+                            ImageUtils().getCameraImage().then((gotImage) {
+                              if(gotImage != null) {
+                                artistAppState.submitForBokehfy(gotImage.path, "chromy", "camera");
+                              }
+                            });
+                          }
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: GestureDetector(
+                    onTap: () {
+                       print("Tapped on current: ${bokehfyImagePosition}");
+                        var nextRoute;
+                        if(chromifyImagePosition == 0) {
+                          nextRoute = ChromyImageViewer();
+                        } else if(chromifyImagePosition == 1) {
+                          nextRoute = ChromyCameraViewer();
+                        } else {
+                          nextRoute = AllChromyViewer();
+                        }
+                        Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => nextRoute
+                            )
+                          );
+                    },
+                    child: CarouselSlider(
+                      onPageChanged: (_) {
+                        chromifyImagePosition = _;
+                      },
+                      height: 200.0,
+                      aspectRatio: 16/9,
+                      viewportFraction: 0.8,
+                      enableInfiniteScroll: false,
+                      autoPlay: false,
+                      autoPlayInterval: Duration(seconds: 4),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      enlargeCenterPage: true,
+                      items: [0, 1, 2].map((i) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return Stack(
+                              children: <Widget>[
+                                Container(
+                                  width: MediaQuery.of(context).size.width / 2 + 60,
+                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    image: DecorationImage(image: ExactAssetImage(chromyListImages[i]), fit: BoxFit.fill)
+                                  ),
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width / 2 + 60,
+                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    gradient: LinearGradient(
+                                      colors: [Colors.transparent, Colors.black45],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter
+                                    )
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 12.0, bottom: 12.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(chromyListImagesInfo[i], style: TextStyle(color: Colors.white70),)
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ],
+                            );
+                          },
+                        );
+                      }).toList()
+                    ),
+                  ),
+                ),
+                /*
                 Text("Appam", style: TextStyle(fontSize: 30.0),),
                 Text("Appam", style: TextStyle(fontSize: 30.0),),
                 Text("Appam", style: TextStyle(fontSize: 30.0),),
@@ -259,7 +560,7 @@ class _MainPageState extends State<MainPage> {
                 Text("Appam", style: TextStyle(fontSize: 30.0),),
                 Text("Appam", style: TextStyle(fontSize: 30.0),),
                 Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
+                Text("Appam", style: TextStyle(fontSize: 30.0),),*/
               ],
             ),
           ),

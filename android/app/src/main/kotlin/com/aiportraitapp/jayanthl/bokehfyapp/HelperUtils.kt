@@ -2,16 +2,22 @@ package com.aiportraitapp.jayanthl.bokehfyapp
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.*
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.ContextCompat.checkSelfPermission
 import java.io.File
+import androidx.core.view.ViewCompat.setAlpha
+import org.opencv.android.Utils
+import org.opencv.core.Mat
+
+
 
 class HelperUtils(mContext: Context) {
 
     var mContext: Context = mContext
 
-    val initDirectoryPath = Environment.getExternalStorageDirectory().toString()
+    val initDirectoryPath = Environment.getExternalStorageDirectory().toString() + "/Bokehfy/"
     val portraitimageDirectory = initDirectoryPath + "/Portrait"
     val portraitImageDirectory = initDirectoryPath + "/Portrait"
     val cameraPortraitDirectory = portraitImageDirectory + "/Camera/"
@@ -20,6 +26,9 @@ class HelperUtils(mContext: Context) {
     val colorHighlightDirectory = initDirectoryPath + "/ColorHighlight"
     val cameraColorHighlightDirectory = colorHighlightDirectory + "/Camera/"
     val imageColorHighlightDirectory = colorHighlightDirectory + "/Images/"
+
+    // AiArtist
+    val aiArtistDirectory = initDirectoryPath + "/AiArtist/"
 
 
     fun createDirectories() {
@@ -53,6 +62,9 @@ class HelperUtils(mContext: Context) {
 
                 if(!File(cameraColorHighlightDirectory).exists()) {
                     File(cameraColorHighlightDirectory).mkdir()
+                }
+                if(!File(aiArtistDirectory).exists()) {
+                    File(aiArtistDirectory).mkdir()
                 }
             }
         }

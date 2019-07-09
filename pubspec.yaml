@@ -43,6 +43,13 @@ flutter:
     - assets/artist/paint.jpg # Selfie Girl
     - assets/artist/notre.jpg # Monkey selfie
     - assets/artist/starry.jpg # Green shadow grass
+    - assets/display_images/bokehfy/img1.jpg
+    - assets/display_images/bokehfy/img2.jpg
+    - assets/display_images/bokehfy/img3.jpg
+    - assets/display_images/chromy/img4.jpg
+    - assets/display_images/chromy/img5.jpg
+    - assets/display_images/chromy/img6.jpg
+
   
 
 

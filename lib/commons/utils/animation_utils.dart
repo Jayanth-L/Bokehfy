@@ -2,6 +2,7 @@ import 'package:bokehfyapp/providers/artist_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
+import 'package:bokehfyapp/routes/artist_image_viewing_route.dart';
 
 class ProgressAnimation extends StatefulWidget {
   @override
@@ -15,8 +16,9 @@ class _ProgressAnimationState extends State<ProgressAnimation> {
 
     var shouldOpenImageViewer = false;
 
+    var state = artistProviderState.getProgress == "processing";
 
-    if(artistProviderState.getProgress == "processing") {
+    if(state) {
       return Container(
         color: Colors.transparent.withOpacity(0.6),
         width: MediaQuery.of(context).size.width,
@@ -31,6 +33,7 @@ class _ProgressAnimationState extends State<ProgressAnimation> {
         )
       );
     } else {
+      print("LoggingOff");
       if(artistProviderState.getProgress == "finished") {
         artistProviderState.resetProgress();
         shouldOpenImageViewer = true;
@@ -47,7 +50,7 @@ class _ProgressAnimationState extends State<ProgressAnimation> {
       try {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (BuildContext context) => Temp()
+            builder: (BuildContext context) => ArtistImageViewRoute()
           )
         );
         break;

@@ -20,10 +20,16 @@ class AiHelpers(mContext: Context) {
         val width = image.width()
         val height = image.height()
 
-        val resizeRatio = 1.0 * RESIZE_SIZE / max(height, width)
+        /*val resizeRatio = 1.0 * RESIZE_SIZE / max(height, width)
         val targetSizeheight = (resizeRatio * height).toInt()
-        val targetSizeWidth = (resizeRatio * width).toInt()
-        val size = Size(targetSizeWidth.toDouble(), targetSizeheight.toDouble())
+        val targetSizeWidth = (resizeRatio * width).toInt()*/
+        val size = Size(RESIZE_SIZE.toDouble(), RESIZE_SIZE.toDouble())
+        Imgproc.resize(image, image, size)
+        return image
+    }
+
+    fun restoreSize(image: Mat, orig_width: Int, orig_height: Int): Mat {
+        val size = Size(orig_width.toDouble(), orig_height.toDouble())
         Imgproc.resize(image, image, size)
         return image
     }

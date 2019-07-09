@@ -12,4 +12,18 @@ class AiPlatformChannel {
     //await Future.delayed(Duration(seconds: 2));
     return result;
   }
+
+  Future sendImageForBokehfycation(String image_path, String ai_type, String ai_source) async {
+    var result = await platform.invokeMethod("aiBokehfy", {"image_path": image_path, "ai_type": ai_type, "ai_source": ai_source});
+    return result;
+  }
+
+
+  /// ************************************************************************************** */
+
+  // Get final Images
+  Future getFinalImagesList(String source) async {
+    var result = await platform.invokeMethod("finalImages", {"source": source});
+    return result;
+  }
 }
