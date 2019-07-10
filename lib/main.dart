@@ -686,7 +686,7 @@ class _MainPageState extends State<MainPage> {
             builder: (context, data, _) {
               print("Data" + data.toString());
 
-              return  Center(child: ProgressAnimation());
+              return  Center(child: ProgressAnimation2());
             },
           )
         ],

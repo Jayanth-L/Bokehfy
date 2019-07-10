@@ -1,4 +1,5 @@
 import 'package:bokehfyapp/providers/artist_provider.dart';
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
@@ -58,16 +59,78 @@ class _ProgressAnimationState extends State<ProgressAnimation> {
     }
   }
 }
-class Temp extends StatefulWidget {
+
+
+
+
+
+
+
+
+
+
+
+
+
+class ProgressAnimation2 extends StatefulWidget {
   @override
-  _TempState createState() => _TempState();
+  _ProgressAnimation2State createState() => _ProgressAnimation2State();
 }
 
-class _TempState extends State<Temp> {
+class _ProgressAnimation2State extends State<ProgressAnimation2> {
+
+  bool successAnimate = false;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(),
-    );
+
+    final artistProviderState = Provider.of<ArtistProviderState>(context);
+
+    var shouldOpenImageViewer = false;
+
+    var state = artistProviderState.getProgress == "processing";
+
+    if(state) {
+      successAnimate = true;
+      return Container(
+        color: Colors.transparent.withOpacity(0.6),
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Center(
+          child: FlareActor(
+            'assets/flare/line_circles.flr',
+            alignment: Alignment.center,
+            animation: "Loading",
+            callback: (_) {
+              print("The animation has completed");
+            },
+          )
+        )
+      );
+    } else {
+      
+      print("LoggingOff");
+      if(artistProviderState.getProgress == "finished") {
+        artistProviderState.resetProgress();
+        shouldOpenImageViewer = true;
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          _openNextPage();
+        });
+      }
+      
+      return Container();
+    } 
+  }
+  Future _openNextPage() async {
+    while(true) {
+      try {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (BuildContext context) => ArtistImageViewRoute()
+          )
+        );
+        break;
+      } catch (e, s) {}
+    }
   }
 }

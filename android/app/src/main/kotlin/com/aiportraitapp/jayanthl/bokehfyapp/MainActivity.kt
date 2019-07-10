@@ -7,6 +7,7 @@ import android.os.Environment
 import androidx.core.content.FileProvider
 import com.aiportraitapp.jayanthl.bokehfyapp.AiClassDir.ArtistAI
 import com.aiportraitapp.jayanthl.bokehfyapp.AiClassDir.BokehfyAI
+import com.google.android.gms.tasks.Tasks
 
 import io.flutter.app.FlutterActivity
 import io.flutter.plugin.common.MethodChannel
@@ -66,26 +67,10 @@ class MainActivity: FlutterActivity() {
                 val aiSource = arguments.get("ai_source").toString()
 
                 if(aiType == "bokehfy") {
-                    AsyncHandler({
-                        try {
-                            BokehfyAI(this).aiConvertToPortrait(imagePath, result, aiSource)
-                            return@AsyncHandler true
-
-                        } catch (e: java.lang.Exception) {
-                            return@AsyncHandler false
-                        }
-                    }, this, result).execute()
+                    BokehfyAI(this).aiConvertToPortrait(imagePath, result, aiSource)
 
                 } else if(aiType == "chromy") {
-                    AsyncHandler({
-                        try {
-                            BokehfyAI(this).aiConvertToChrome(imagePath, result, aiSource)
-                            return@AsyncHandler true
-
-                        } catch (e: java.lang.Exception) {
-                            return@AsyncHandler false
-                        }
-                    }, this, result).execute()
+                    BokehfyAI(this).aiConvertToChrome(imagePath, result, aiSource)
                 }
             }
 

@@ -29,7 +29,7 @@ class AsyncHandler(val handler: () -> Boolean, mContext: Context, pendingIntentR
             val resultList = ArrayList<String>()
             resultList.add("failure")
             resultList.add("null")
-            pendingIntentResult.success(resultList)
+
         }
     }
 }
