@@ -1,17 +1,20 @@
 var artistImagesList = [
   "assets/artist/starry.jpg",
+  "assets/artist/headofcl.jpg",
+  "assets/artist/femmes.jpg",
   "assets/artist/notre.jpg",
-  "assets/artist/paint.jpg",
 ];
 
 var artistImageName = [
   "Starry",
+  "Head of CL",
+  "Femmes",
   "Notre",
-  "Paint"
 ];
 
 var artistImageDescription = [
-  "Colourfuly holi painting",
-  "notre damus paintyerse",
-  "CirclyCircle"
+  "Starry night texture",
+  "Head of cl artist",
+  "femmes styles",
+  "Notre Painting",
 ];

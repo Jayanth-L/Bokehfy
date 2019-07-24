@@ -85,15 +85,14 @@ class MainActivity: FlutterActivity() {
                 }
                 bokehImagesList.removeAt(0)
                 result.success(bokehImagesList)
-                } else if(methodCall.method.equals("getChromifyImages")) {
+            } else if (methodCall.method.equals("getChromifyImages")) {
                 val chromifyImagesList:  ArrayList<String> = arrayListOf()
                 File(HelperUtils(this).imageColorHighlightDirectory).walk().forEach {
                     chromifyImagesList.add(it.toString())
                 }
                 chromifyImagesList.removeAt(0)
                 result.success(chromifyImagesList)
-            }
-                else if(methodCall.method.equals("getBokehImagesCamera")) {
+            } else if(methodCall.method.equals("getBokehImagesCamera")) {
                 val bokehImagesList:  ArrayList<String> = arrayListOf()
                 File(HelperUtils(this).cameraPortraitDirectory).walk().forEach {
                     bokehImagesList.add(it.toString())
@@ -138,6 +137,13 @@ class MainActivity: FlutterActivity() {
 
 
                 result.success(chromifyImageList2 + chromifyImagesList)
+            } else if(methodCall.method.equals("getAiArtistImages")) {
+                val bokehImagesList:  ArrayList<String> = arrayListOf()
+                File(HelperUtils(this).aiArtistDirectory).walk().forEach {
+                    bokehImagesList.add(it.toString())
+                }
+                bokehImagesList.removeAt(0)
+                result.success(bokehImagesList)
             }
 
             else if(methodCall.method.equals("shareImageFile")) {

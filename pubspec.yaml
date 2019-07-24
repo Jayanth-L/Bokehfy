@@ -21,9 +21,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   carousel_slider: ^1.3.0
-  provider:
+  provider: 
   image_picker: ^0.6.0+10
   flare_flutter: ^1.5.4
+  share: ^0.6.1+1
+  url_launcher: ^5.0.5
 
 dev_dependencies:
   flutter_test:
@@ -41,9 +43,10 @@ flutter:
 #    - assets/img3.jpg
 #    - assets/img4.jpg
 #    - assets/img5.jpg
-    - assets/artist/paint.jpg # Selfie Girl
-    - assets/artist/notre.jpg # Monkey selfie
-    - assets/artist/starry.jpg # Green shadow grass
+    - assets/artist/headofcl.jpg # Selfie Girl
+    - assets/artist/notre.jpg
+    - assets/artist/femmes.jpg
+    - assets/artist/starry.jpg
     - assets/display_images/bokehfy/img1.jpg
     - assets/display_images/bokehfy/img2.jpg
     - assets/display_images/bokehfy/img3.jpg

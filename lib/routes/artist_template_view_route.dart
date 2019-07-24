@@ -96,14 +96,14 @@ class _ArtistTemplateViewouteState extends State<ArtistTemplateViewoute> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12.0),
-                                      color: Colors.white
+                                      
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0),
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children: <Widget>[
-                                          Text("Select source", style: TextStyle(fontSize: 20.0)),
+                                          Text("Select source", style: TextStyle(fontSize: 20.0, color: Colors.white)),
                                           Padding(
                                             padding: const EdgeInsets.all(30.0),
                                             child: GestureDetector(

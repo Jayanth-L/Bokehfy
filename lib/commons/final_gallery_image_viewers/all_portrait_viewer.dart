@@ -48,42 +48,44 @@ class _AllPortraitViewerState extends State<AllPortraitViewer> {
             icon: Icon(Icons.delete),
             onPressed: () {
 
+              if(bokehImagesList.length != 0) {
                 showDialog(
-                context: context,
-                barrierDismissible: true,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text("Delete ?"),
-                    content: Text("Delete the pic ?"),
-                    actions: <Widget>[
-                      
-                      FlatButton(
-                        child: Text("No"),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        }
-                      ),
-                      MaterialButton(
-                        color: Colors.blueAccent,
-                        child: Text("yes", style: TextStyle(color: Colors.white)),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          var reversedList = [];
-                          for(var images in bokehImagesList.reversed) {
-                            reversedList.add(images);
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("Delete ?"),
+                      content: Text("Delete the pic ?"),
+                      actions: <Widget>[
+                        
+                        FlatButton(
+                          child: Text("No"),
+                          onPressed: () {
+                            Navigator.of(context).pop();
                           }
-                          print("Deleting ${reversedList[_currentPageIndex]}");
-                          File(reversedList[_currentPageIndex]).delete();
-                          setState(() {
-                            var setting_state = true;
-                            _pageController = PageController(initialPage: _currentPageIndex -1);
-                          });
-                        },
-                      ),
-                    ],
-                  );
-                }
-              );
+                        ),
+                        MaterialButton(
+                          color: Colors.blueAccent,
+                          child: Text("yes", style: TextStyle(color: Colors.white)),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            var reversedList = [];
+                            for(var images in bokehImagesList.reversed) {
+                              reversedList.add(images);
+                            }
+                            print("Deleting ${reversedList[_currentPageIndex]}");
+                            File(reversedList[_currentPageIndex]).delete();
+                            setState(() {
+                              var setting_state = true;
+                              _pageController = PageController(initialPage: _currentPageIndex -1);
+                            });
+                          },
+                        ),
+                      ],
+                    );
+                  }
+                );
+              }
             },
           )
         ],

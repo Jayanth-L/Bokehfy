@@ -6,12 +6,12 @@ import 'package:flutter/services.dart';
  * email: jayanthl@protonmail.com
  */
 
-class PortraitImageViewPage extends StatefulWidget {
+class AiArtistViewer extends StatefulWidget {
   @override
-  _PortraitImageViewPageState createState() => _PortraitImageViewPageState();
+  _AiArtistViewerState createState() => _AiArtistViewerState();
 }
 
-class _PortraitImageViewPageState extends State<PortraitImageViewPage> {
+class _AiArtistViewerState extends State<AiArtistViewer> {
   static final platform = MethodChannel("CHANNEL_BOKEHFY");
   List bokehImagesList = List<String>();
   var image = <Widget>[];
@@ -30,7 +30,7 @@ class _PortraitImageViewPageState extends State<PortraitImageViewPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text("Chromy Images"),
+        title: Text("Ai Artist Images"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.share),
@@ -90,7 +90,7 @@ class _PortraitImageViewPageState extends State<PortraitImageViewPage> {
       ),
       backgroundColor: Colors.black,
         body: FutureBuilder(
-      future: _getBokehImages(),
+      future: _getAiArtistImages(),
       builder: (BuildContext context, AsyncSnapshot asyncshapshot) {
         var opt = <Widget>[];
         bokehImagesList.sort();
@@ -118,9 +118,9 @@ class _PortraitImageViewPageState extends State<PortraitImageViewPage> {
     ));
   }
 
-  Future<List> _getBokehImages() async {
+  Future<List> _getAiArtistImages() async {
     bokehImagesList =
-        await platform.invokeMethod("getBokehImages", {"images": "images"});
+        await platform.invokeMethod("getAiArtistImages", {"images": "images"});
     bokehImagesList.sort();
     Iterable reversedImagesList = bokehImagesList.reversed;
     return reversedImagesList.toList();

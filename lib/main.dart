@@ -1,10 +1,13 @@
 import 'dart:math';
+import 'package:bokehfyapp/commons/final_gallery_image_viewers/ai_artist_viewer.dart';
 import 'package:bokehfyapp/commons/final_gallery_image_viewers/all_chromy_viewer.dart';
 import 'package:bokehfyapp/commons/final_gallery_image_viewers/chromy_camera_viewer.dart';
 import 'package:bokehfyapp/commons/final_gallery_image_viewers/chromy_image_viewer.dart';
 import 'package:bokehfyapp/commons/platform_channels/image_utils.dart';
 import 'package:bokehfyapp/commons/platform_channels/platform_channels.dart';
+import 'package:bokehfyapp/commons/utils/misc_functions.dart';
 import 'package:bokehfyapp/providers/artist_provider.dart';
+import 'package:bokehfyapp/routes/privacy_policy_route.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:bokehfyapp/routes/artist_template_view_route.dart';
@@ -30,7 +33,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.blue),
+        theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Raleway"),
         darkTheme: ThemeData.light(),
         home: MainPage()
       ),
@@ -96,7 +99,12 @@ class _MainPageState extends State<MainPage> {
                           Icons.menu,
                           size: 30.0,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) => MiscFunctions().openDrawer(context)
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -111,8 +119,10 @@ class _MainPageState extends State<MainPage> {
                         letterSpacing: 1.0
                       ),),
                       IconButton(
-                        icon: Icon(Icons.donut_large, size: 24.0),
-                        onPressed: () {},
+                        icon: Icon(Icons.info_outline, size: 24.0),
+                        onPressed: () {
+                          MiscFunctions().showDocs(context, "Appam", "Appam");
+                        },
                       )
                     ],
                   ),
@@ -136,7 +146,7 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                       SizedBox(width: 15.0,),
-                      Text("5+ textures!", style: TextStyle(color: Colors.blueAccent),)
+                      Text("${bokehfyListImages.length}+ textures!", style: TextStyle(color: Colors.blueAccent),)
                     ],
                   ),
                 ),
@@ -184,12 +194,56 @@ class _MainPageState extends State<MainPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
+                      Text("Ai Artist Gallery", style: TextStyle(
+                        fontSize: 20.0,
+                        letterSpacing: 1.0
+                      ),),
+                      IconButton(
+                        icon: Icon(Icons.info_outline, size: 24.0),
+                        onPressed: () {},
+                      )
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => AiArtistViewer()
+                          )
+                        );
+                      },
+                      child: Container(
+                        height: 100.0,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15.0),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.green, Colors.blue
+                            ]
+                          ),
+                        ),
+                        child: Center(
+                          child: Text("Ai Paint Gallery", style: TextStyle(fontSize: 20.0, color: Colors.white),),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
                       Text("Portrait Mode", style: TextStyle(
                         fontSize: 30.0,
                         letterSpacing: 1.0
                       ),),
                       IconButton(
-                        icon: Icon(Icons.donut_large, size: 24.0),
+                        icon: Icon(Icons.info_outline, size: 24.0),
                         onPressed: () {},
                       )
                     ],
@@ -247,14 +301,14 @@ class _MainPageState extends State<MainPage> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(12.0),
-                                          color: Colors.white
+                                          color: Colors.transparent
                                         ),
                                         child: Padding(
                                           padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0),
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.start,
                                             children: <Widget>[
-                                              Text("Select source", style: TextStyle(fontSize: 20.0)),
+                                              Text("Select source", style: TextStyle(fontSize: 20.0, color: Colors.white)),
                                               Padding(
                                                 padding: const EdgeInsets.all(30.0),
                                                 child: GestureDetector(
@@ -426,7 +480,7 @@ class _MainPageState extends State<MainPage> {
                         letterSpacing: 1.0
                       ),),
                       IconButton(
-                        icon: Icon(Icons.donut_large, size: 24.0),
+                        icon: Icon(Icons.info_outline, size: 24.0),
                         onPressed: () {},
                       )
                     ],
@@ -484,14 +538,14 @@ class _MainPageState extends State<MainPage> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(12.0),
-                                          color: Colors.white
+                                          color: Colors.transparent
                                         ),
                                         child: Padding(
                                           padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0),
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.start,
                                             children: <Widget>[
-                                              Text("Select source", style: TextStyle(fontSize: 20.0)),
+                                              Text("Select source", style: TextStyle(fontSize: 20.0, color: Colors.white)),
                                               Padding(
                                                 padding: const EdgeInsets.all(30.0),
                                                 child: GestureDetector(
@@ -690,6 +744,40 @@ class _MainPageState extends State<MainPage> {
             },
           )
         ],
+      ),
+    );
+  }
+
+  Widget _renderArtistImageListView() {
+    return Container(
+      height: 150,
+      child: ListView.builder(
+        itemCount: 5,
+        padding: EdgeInsets.only(left: 16.0),
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) => _renderItems(context, index),
+      ),
+    );
+  }
+
+  Widget _renderItems(BuildContext context, int index) {
+    return GestureDetector(
+      onTap: () {
+
+      },
+      child: Container(
+        margin: EdgeInsets.only(right: 20.0),
+        width: 150,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15.0),
+            image: DecorationImage(
+              image: AssetImage("assets/artist/paint.jpg"),
+              fit: BoxFit.cover
+            )
+          ),
+          height: 150,
+        )
       ),
     );
   }

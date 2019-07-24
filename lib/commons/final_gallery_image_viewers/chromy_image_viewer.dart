@@ -49,41 +49,43 @@ class _ChromyImageViewerState extends State<ChromyImageViewer> {
             onPressed: () {
               Navigator.of(context).pop();
 
-              showDialog(
-                context: context,
-                barrierDismissible: true,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text("Delete ?"),
-                    content: Text("Delete the pic ?"),
-                    actions: <Widget>[
-                      
-                      FlatButton(
-                        child: Text("No"),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        }
-                      ),
-                      MaterialButton(
-                        color: Colors.blueAccent,
-                        child: Text("yes", style: TextStyle(color: Colors.white)),
-                        onPressed: () {
-                          var reversedList = [];
-                          for(var images in bokehImagesList.reversed) {
-                            reversedList.add(images);
+              if(bokehImagesList.length != 0) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("Delete ?"),
+                      content: Text("Delete the pic ?"),
+                      actions: <Widget>[
+                        
+                        FlatButton(
+                          child: Text("No"),
+                          onPressed: () {
+                            Navigator.of(context).pop();
                           }
-                          print('Deleting file ${reversedList[_currentPageIndex]}');
-                          File(reversedList[_currentPageIndex]).delete();
-                          setState(() {
-                            var setting_state = true;
-                            _pageController = PageController(initialPage: _currentPageIndex -1);
-                          });
-                        },
-                      ),
-                    ],
-                  );
-                }
-              );
+                        ),
+                        MaterialButton(
+                          color: Colors.blueAccent,
+                          child: Text("yes", style: TextStyle(color: Colors.white)),
+                          onPressed: () {
+                            var reversedList = [];
+                            for(var images in bokehImagesList.reversed) {
+                              reversedList.add(images);
+                            }
+                            print('Deleting file ${reversedList[_currentPageIndex]}');
+                            File(reversedList[_currentPageIndex]).delete();
+                            setState(() {
+                              var setting_state = true;
+                              _pageController = PageController(initialPage: _currentPageIndex -1);
+                            });
+                          },
+                        ),
+                      ],
+                    );
+                  }
+                );
+              }
             },
           )
         ],
