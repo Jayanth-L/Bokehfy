@@ -69,12 +69,17 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            minifyEnabled true
-            useProguard true
-            // applicationIdSuffix ".debug"
+            // minifyEnabled true
+            // useProguard true
+            applicationIdSuffix ".debug"
 
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+	debug {
+            applicationIdSuffix ".debug"
+
+            signingConfig signingConfigs.release
+	}
     }
     externalNativeBuild {
         ndkBuild {
@@ -101,9 +106,8 @@ dependencies {
     //androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':openCV401')
 
-    implementation 'org.tensorflow:tensorflow-lite:+'
-    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
-
+    implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.google.firebase:firebase-ml-model-interpreter:20.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

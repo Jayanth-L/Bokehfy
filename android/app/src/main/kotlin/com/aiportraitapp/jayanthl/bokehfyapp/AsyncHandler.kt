@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.AsyncTask
 import android.widget.Toast
 import io.flutter.plugin.common.MethodChannel
-import java.lang.reflect.Method
 
 class AsyncHandler(val handler: () -> Boolean, mContext: Context, pendingIntentResult: MethodChannel.Result): AsyncTask<Context, Void, Boolean>() {
 
@@ -24,10 +23,13 @@ class AsyncHandler(val handler: () -> Boolean, mContext: Context, pendingIntentR
 
         if (result!!) {
             // Toast.makeText(mContext, "BokehFied", Toast.LENGTH_LONG).show()
-            pendingIntentResult.success("success")
+
         } else {
             Toast.makeText(mContext, "The Image doesn't exists", Toast.LENGTH_LONG).show()
-            pendingIntentResult.success("failure")
+            val resultList = ArrayList<String>()
+            resultList.add("failure")
+            resultList.add("null")
+
         }
     }
 }
