@@ -19,6 +19,7 @@ import 'package:bokehfyapp/commons/display_images_list_data.dart';
 import 'commons/final_gallery_image_viewers/portrait_image_viewer.dart';
 import 'commons/final_gallery_image_viewers/portrait_camera_viewer.dart';
 import 'commons/final_gallery_image_viewers/all_portrait_viewer.dart';
+import 'miscs/strings.dart';
 
 void main() => runApp(MyApp());
 
@@ -121,7 +122,7 @@ class _MainPageState extends State<MainPage> {
                       IconButton(
                         icon: Icon(Icons.info_outline, size: 24.0),
                         onPressed: () {
-                          MiscFunctions().showDocs(context, "Appam", "Appam");
+                          MiscFunctions().showDocs(context, "Bokehfy", bokehfy_explain);
                         },
                       )
                     ],
@@ -200,7 +201,9 @@ class _MainPageState extends State<MainPage> {
                       ),),
                       IconButton(
                         icon: Icon(Icons.info_outline, size: 24.0),
-                        onPressed: () {},
+                        onPressed: () {
+                          MiscFunctions().showDocs(context, "Ai Artist", ai_artist_explain);
+                        },
                       )
                     ],
                   ),
@@ -244,7 +247,9 @@ class _MainPageState extends State<MainPage> {
                       ),),
                       IconButton(
                         icon: Icon(Icons.info_outline, size: 24.0),
-                        onPressed: () {},
+                        onPressed: () {
+                          MiscFunctions().showDocs(context, "Portrait Mode", bokehfy_explain);
+                        },
                       )
                     ],
                   ),
@@ -475,13 +480,15 @@ class _MainPageState extends State<MainPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text("Chromy Mode", style: TextStyle(
+                      Text("Mono Color", style: TextStyle(
                         fontSize: 30.0,
                         letterSpacing: 1.0
                       ),),
                       IconButton(
                         icon: Icon(Icons.info_outline, size: 24.0),
-                        onPressed: () {},
+                        onPressed: () {
+                          MiscFunctions().showDocs(context, "Mono Color", monochrome_background_explain);
+                        },
                       )
                     ],
                   ),
@@ -704,35 +711,6 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ),
                 ),
-                /*
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),
-                Text("Appam", style: TextStyle(fontSize: 30.0),),*/
               ],
             ),
           ),
