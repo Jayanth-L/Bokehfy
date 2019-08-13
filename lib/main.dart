@@ -1,854 +1,331 @@
-import 'dart:math';
-import 'package:bokehfyapp/commons/final_gallery_image_viewers/ai_artist_viewer.dart';
-import 'package:bokehfyapp/commons/final_gallery_image_viewers/all_chromy_viewer.dart';
-import 'package:bokehfyapp/commons/final_gallery_image_viewers/chromy_camera_viewer.dart';
-import 'package:bokehfyapp/commons/final_gallery_image_viewers/chromy_image_viewer.dart';
-import 'package:bokehfyapp/commons/platform_channels/image_utils.dart';
-import 'package:bokehfyapp/commons/platform_channels/platform_channels.dart';
-import 'package:bokehfyapp/commons/utils/misc_functions.dart';
-import 'package:bokehfyapp/providers/artist_provider.dart';
-import 'package:bokehfyapp/routes/privacy_policy_route.dart';
+ 
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:bokehfyapp/routes/artist_template_view_route.dart';
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
-import 'commons/artist_images_list.dart';
-import 'commons/utils/animation_utils.dart';
-import 'package:bokehfyapp/commons/display_images_list_data.dart';
-import 'commons/final_gallery_image_viewers/portrait_image_viewer.dart';
-import 'commons/final_gallery_image_viewers/portrait_camera_viewer.dart';
-import 'commons/final_gallery_image_viewers/all_portrait_viewer.dart';
-import 'miscs/strings.dart';
+import 'main_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 
-void main() => runApp(MyApp());
+/**
+ * author: Jayanrh L
+ * email: jayanthl@protonmail.com
+ */
 
-class MyApp extends StatelessWidget {
+void main() => runApp(MyBokehfyApp());
+
+class MyBokehfyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          builder: (BuildContext context) => ArtistProviderState(),
-        ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Raleway"),
-        darkTheme: ThemeData.light(),
-        home: MainPage()
-      ),
+    return MaterialApp(
+      title: "Intro slider",
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Raleway"),
+      home: IntroSlider(),
     );
   }
 }
 
-class MainPage extends StatefulWidget {
+class IntroSlider extends StatefulWidget {
   @override
-  _MainPageState createState() => _MainPageState();
+  _IntroSliderState createState() => _IntroSliderState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _IntroSliderState extends State<IntroSlider> {
+  static final platform = MethodChannel("CHANNEL_BOKEHFY");
 
-  var numberOfPaintImages = artistImagesList.length;
-  var currentPage;
-  var artistPageAfterChanged = 10;
+  bool _isTheAppFirstTime;
+  var pages = [Page1(), Page2(), Page3()];
 
-  // misc
-  var bokehfyImagePosition = 0;
-  var chromifyImagePosition = 0;
+  var _isPageVisible = true;
+  var _currentPage = 0;
+
+  var _isNextButtonEnabled = true;
 
   @override
   void initState() {
-    
-    currentPage = numberOfPaintImages.toDouble() - 1.0;
     super.initState();
+    _isFirstTimeAndPermission().then((_) {
+      if (_ == "true") {
+        setState(() {
+          this._isTheAppFirstTime = true;
+        });
+      } else {
+        setState(() {
+          _isTheAppFirstTime = false;
+        });
+      }
+    });
   }
-
 
   @override
   Widget build(BuildContext context) {
-
-    PageController controller = PageController(initialPage: 10);
-    controller.addListener(() {
-      setState(() {
-        currentPage = controller.page;
-      });
-    });
-
-    final artistAppState = Provider.of<ArtistProviderState>(context);
-
-
-    
-
-    return Scaffold(
-      // backgroundColor: Color(0xFF2d3447),
-      // backgroundColor: Colors.black,
-      body: Stack(
-        children: <Widget>[
-          SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 12.0, right: 12.0, top: 30.0, bottom: 8.0
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(
-                          Icons.menu,
-                          size: 30.0,
-                        ),
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (BuildContext context) => MiscFunctions().openDrawer(context)
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+    if (_isTheAppFirstTime == null) {
+      return Container(
+        color: Colors.white,
+      );
+    } else if (_isTheAppFirstTime) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Text(
+            "BOKEHFY",
+            style: TextStyle(color: Colors.black),
+          ),
+          centerTitle: true,
+          elevation: 0.0,
+        ),
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  color: Colors.white,
+                  child: AnimatedOpacity(
+                      duration: Duration(seconds: 1),
+                      opacity: _isPageVisible ? 1.0 : 0.0,
+                      child: pages[_currentPage]),
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text("Bokehfy", style: TextStyle(
-                        fontSize: 46.0,
-                        letterSpacing: 1.0
-                      ),),
-                      IconButton(
-                        icon: Icon(Icons.info_outline, size: 24.0),
-                        onPressed: () {
-                          MiscFunctions().showDocs(context, "Bokehfy", bokehfy_explain);
-                        },
-                      )
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 20.0),
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFFff6e6e),
-                          borderRadius: BorderRadius.circular(20.0)
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 22.0, vertical: 6.0
-                            ),
-                            child: Text("Paint Artist", style: TextStyle(color: Colors.white),),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 15.0,),
-                      Text("${bokehfyListImages.length}+ textures!", style: TextStyle(color: Colors.blueAccent),)
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 30,
-                  width: 120,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.0),
-                    color: Colors.blueAccent
-                  ),
-                  child: Center(child: Text("New Feature!!!", style: TextStyle(color: Colors.white),)),
-                ),
-
-                GestureDetector(
-                  onTap: () {
-                    print("tapped: $currentPage");
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => ArtistTemplateViewoute(currentImage: artistPageAfterChanged,)
-                      )
-                    );
-                  } ,
-                  child: Stack(
-                    children: <Widget>[
-                      CardScrollWidget(currentPage),
-                      Positioned.fill(
-                        child: PageView.builder(
-                          onPageChanged: (page) {
-                            print("Page changed: $page");
-                            artistPageAfterChanged = page;
-                          },
-                          itemCount: numberOfPaintImages,
-                          controller: controller,
-                          reverse: true,
-                          itemBuilder: (context, index) {
-                            return Container();
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text("Ai Artist Gallery", style: TextStyle(
-                        fontSize: 20.0,
-                        letterSpacing: 1.0
-                      ),),
-                      IconButton(
-                        icon: Icon(Icons.info_outline, size: 24.0),
-                        onPressed: () {
-                          MiscFunctions().showDocs(context, "Ai Artist", ai_artist_explain);
-                        },
-                      )
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  child: Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => AiArtistViewer()
-                          )
-                        );
-                      },
-                      child: Container(
-                        height: 100.0,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.0),
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.green, Colors.blue
-                            ]
-                          ),
-                        ),
-                        child: Center(
-                          child: Text("Ai Paint Gallery", style: TextStyle(fontSize: 20.0, color: Colors.white),),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text("Portrait Mode", style: TextStyle(
-                        fontSize: 30.0,
-                        letterSpacing: 1.0
-                      ),),
-                      IconButton(
-                        icon: Icon(Icons.info_outline, size: 24.0),
-                        onPressed: () {
-                          MiscFunctions().showDocs(context, "Portrait Mode", bokehfy_explain);
-                        },
-                      )
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 20.0),
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(20.0)
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 22.0, vertical: 6.0
-                            ),
-                            child: Text("Bokeh pics", style: TextStyle(color: Colors.white),),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 15.0,),
-                      Text("25+ Stories", style: TextStyle(color: Colors.blueAccent),)
-                    ],
-                  ),
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 30.0, bottom: 30.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          showGeneralDialog(
-                            context: context,
-                            pageBuilder: (context, animation1, animation2) {},
-                            barrierDismissible: true,
-                            barrierColor: Colors.black.withOpacity(0.4),
-                            barrierLabel: "",
-                            transitionBuilder: (context, animation1, animation2, child) {
-                              return Transform.scale(
-                                scale: animation1.value,
-                                child: Opacity(
-                                  opacity: animation1.value,
-                                  child: Dialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                    elevation: 0.0,
-                                    backgroundColor: Colors.transparent,
-                                    child: SafeArea(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12.0),
-                                          color: Colors.transparent
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text("Select source", style: TextStyle(fontSize: 20.0, color: Colors.white)),
-                                              Padding(
-                                                padding: const EdgeInsets.all(30.0),
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    //Navigator.of(context).pop();
-                                                    Navigator.of(context).pop();
-                                                    // open the dialog for image picking
-                                                    ImageUtils().getGalleryImage().then((gotImage) {
-                                                      print("ImageUtilsGet: " + gotImage.toString());
-
-                                                      if(gotImage != null) {
-                                                        artistAppState.submitForBokehfy(gotImage.path, "bokehfy", "gallery");
-                                                      }
-                                                    }); 
-                                                  },
-                                                  child: Container(
-                                                    width: MediaQuery.of(context).size.width / 2,
-                                                    height: 50,
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        colors: [Colors.blue, Colors.green],
-                                                      ),
-                                                      borderRadius: BorderRadius.circular(30.0)
-                                                    ),
-                                                    child: Center(child: Icon(Icons.image_aspect_ratio, color: Colors.white,))
-                                                  ),
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  //Navigator.of(context).pop();
-                                                  Navigator.of(context).pop();
-                                                  // open the dialog for image picking
-
-                                                  ImageUtils().getCameraImage().then((gotImage) {
-                                                      print("ImageUtilsGet: " + gotImage.toString());
-
-                                                     if(gotImage != null) {
-                                                        artistAppState.submitForBokehfy(gotImage.path, "bokehfy", "camera");
-                                                      }
-                                                  });
-                                                },
-                                                child: Container(
-                                                  width: MediaQuery.of(context).size.width / 2,
-                                                  height: 50,
-                                                  decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                      colors: [Colors.blue, Colors.green],
-                                                    ),
-                                                    borderRadius: BorderRadius.circular(30.0)
-                                                  ),
-                                                  child: Center(child: Icon(Icons.camera, color: Colors.white,))
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        width: MediaQuery.of(context).size.width - 100,
-                                        height: MediaQuery.of(context).size.height - 500,
-                                      ),
-                                    ),
-                                  )
-                                ),
-                              );
-                            },
-                            transitionDuration: Duration(milliseconds: 150)
-                          );
-                        },
-                        child: Container(
-                          width: 100,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Colors.blue, Colors.green],
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular((30.0)))
-                          ),
-                          child: Center(child: Text("Use", style: TextStyle(color: Colors.white),)),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      print("Tapped on current: ${bokehfyImagePosition}");
-                      var nextRoute;
-                      if(bokehfyImagePosition == 0) {
-                        nextRoute = PortraitImageViewPage();
-                      } else if(bokehfyImagePosition == 1) {
-                        nextRoute = PortraitCameraViewPage();
-                      } else {
-                        nextRoute = AllPortraitViewer();
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  MaterialButton(
+                    child: Icon(Icons.arrow_back_ios),
+                    onPressed: () {
+                      print("Pressed current page");
+                      if (_currentPage > 0) {
+                        setState(() {
+                          _isPageVisible = false;
+                          Future.delayed(Duration(seconds: 1), () {
+                            setState(() {
+                              _currentPage = _currentPage - 1;
+                              _isPageVisible = true;
+                            });
+                          });
+                        });
                       }
-                      Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => nextRoute
-                          )
-                        );
+                      print("going back");
                     },
-                    child: CarouselSlider(
-                      height: 200.0,
-                      aspectRatio: 16/9,
-                      autoPlayAnimationDuration: Duration(milliseconds: 500),
-                      viewportFraction: 0.8,
-                      enableInfiniteScroll: false,
-                      autoPlay: false,
-                      autoPlayInterval: Duration(seconds: 4),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      enlargeCenterPage: true,
-                      onPageChanged: (_) {
-                        print("changed image: ${_}");
-                        bokehfyImagePosition = _;
-                      },
-                      items: [0, 1, 2].map((i) {
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return Stack(
-                              children: <Widget>[
-                                Container(
-                                  width: MediaQuery.of(context).size.width / 2 + 60,
-                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    image: DecorationImage(image: ExactAssetImage(bokehfyListImages[i]), fit: BoxFit.fill)
-                                  )
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width / 2 + 60,
-                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    gradient: LinearGradient(
-                                      colors: [Colors.transparent, Colors.black45],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter
-                                    )
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 12.0, bottom: 12.0),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(bokehfyListImagesInfo[i], style: TextStyle(color: Colors.white70),)
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              ],
-                            );
-                          },
-                        );
-                      }).toList()
-                    ),
                   ),
-                ),
-
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text("Mono Color", style: TextStyle(
-                        fontSize: 30.0,
-                        letterSpacing: 1.0
-                      ),),
-                      IconButton(
-                        icon: Icon(Icons.info_outline, size: 24.0),
-                        onPressed: () {
-                          MiscFunctions().showDocs(context, "Mono Color", monochrome_background_explain);
-                        },
-                      )
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 20.0),
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(20.0)
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 22.0, vertical: 6.0
-                            ),
-                            child: Text("Chromy pics", style: TextStyle(color: Colors.white),),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 15.0,),
-                      Text("25+ Stories", style: TextStyle(color: Colors.blueAccent),)
-                    ],
-                  ),
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 30.0, bottom: 30.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          showGeneralDialog(
-                            context: context,
-                            pageBuilder: (context, animation1, animation2) {},
-                            barrierDismissible: true,
-                            barrierColor: Colors.black.withOpacity(0.4),
-                            barrierLabel: "",
-                            transitionBuilder: (context, animation1, animation2, child) {
-                              return Transform.scale(
-                                scale: animation1.value,
-                                child: Opacity(
-                                  opacity: animation1.value,
-                                  child: Dialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                    elevation: 0.0,
-                                    backgroundColor: Colors.transparent,
-                                    child: SafeArea(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12.0),
-                                          color: Colors.transparent
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text("Select source", style: TextStyle(fontSize: 20.0, color: Colors.white)),
-                                              Padding(
-                                                padding: const EdgeInsets.all(30.0),
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    //Navigator.of(context).pop();
-                                                    Navigator.of(context).pop();
-                                                    // open the dialog for image picking
-                                                    ImageUtils().getGalleryImage().then((gotImage) {
-                                                      print("ImageUtilsGet: " + gotImage.toString());
-
-                                                      if(gotImage != null) {
-                                                        artistAppState.submitForBokehfy(gotImage.path, "chromy", "gallery");
-                                                      }
-                                                    }); 
-                                                  },
-                                                  child: Container(
-                                                    width: MediaQuery.of(context).size.width / 2,
-                                                    height: 50,
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        colors: [Colors.blue, Colors.green],
-                                                      ),
-                                                      borderRadius: BorderRadius.circular(30.0)
-                                                    ),
-                                                    child: Center(child: Icon(Icons.image_aspect_ratio, color: Colors.white,))
-                                                  ),
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  //Navigator.of(context).pop();
-                                                  Navigator.of(context).pop();
-                                                  // open the dialog for image picking
-
-                                                  ImageUtils().getCameraImage().then((gotImage) {
-                                                      print("ImageUtilsGet: " + gotImage.toString());
-
-                                                      if(gotImage != null) {
-                                                        artistAppState.submitForBokehfy(gotImage.path, "chromy", "camera");
-                                                      }
-                                                  });
-                                                },
-                                                child: Container(
-                                                  width: MediaQuery.of(context).size.width / 2,
-                                                  height: 50,
-                                                  decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                      colors: [Colors.blue, Colors.green],
-                                                    ),
-                                                    borderRadius: BorderRadius.circular(30.0)
-                                                  ),
-                                                  child: Center(child: Icon(Icons.camera, color: Colors.white,))
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        width: MediaQuery.of(context).size.width - 100,
-                                        height: MediaQuery.of(context).size.height - 500,
-                                      ),
-                                    ),
-                                  )
-                                ),
-                              );
-                            },
-                            transitionDuration: Duration(milliseconds: 150)
-                          );
-                        },
-                        child: Container(
-                          width: 100,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Colors.red, Colors.amber],
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular((30.0)))
-                          ),
-                          child: Center(child: Text("Use", style: TextStyle(color: Colors.white),)),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: GestureDetector(
-                    onTap: () {
-                       print("Tapped on current: ${bokehfyImagePosition}");
-                        var nextRoute;
-                        if(chromifyImagePosition == 0) {
-                          nextRoute = ChromyImageViewer();
-                        } else if(chromifyImagePosition == 1) {
-                          nextRoute = ChromyCameraViewer();
+                  MaterialButton(
+                    child: Icon(Icons.send),
+                    onPressed: () {
+                      if (_isNextButtonEnabled) {
+                        _isNextButtonEnabled = false;
+                        if (_currentPage == 1) {
+                          _checkPermission().then((_) {
+                            if (_ == "true") {
+                              setState(() {
+                                _isPageVisible = false;
+                                Future.delayed(Duration(seconds: 1), () {
+                                  setState(() {
+                                    _currentPage = _currentPage + 1;
+                                    _isPageVisible = true;
+                                    _isNextButtonEnabled = true;
+                                  });
+                                });
+                              }
+                              
+                              );} else {
+                                _isNextButtonEnabled = true;
+                              }
+                          });
+                        } else if (_currentPage < 2) {
+                          setState(() {
+                            _isPageVisible = false;
+                            Future.delayed(Duration(seconds: 1), () {
+                              setState(() {
+                                _currentPage = _currentPage + 1;
+                                _isPageVisible = true;
+                                _isNextButtonEnabled = true;
+                              });
+                            });
+                          });
                         } else {
-                          nextRoute = AllChromyViewer();
+                          _setTheInitFlag().then((_) {
+                             Navigator.of(context).pop();
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  MyApp()));
+                          });
                         }
-                        Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (BuildContext context) => nextRoute
-                            )
-                          );
+                        print("Pressed");
+                      }
                     },
-                    child: CarouselSlider(
-                      onPageChanged: (_) {
-                        chromifyImagePosition = _;
-                      },
-                      height: 200.0,
-                      aspectRatio: 16/9,
-                      viewportFraction: 0.8,
-                      enableInfiniteScroll: false,
-                      autoPlay: false,
-                      autoPlayInterval: Duration(seconds: 4),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      enlargeCenterPage: true,
-                      items: [0, 1, 2].map((i) {
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return Stack(
-                              children: <Widget>[
-                                Container(
-                                  width: MediaQuery.of(context).size.width / 2 + 60,
-                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    image: DecorationImage(image: ExactAssetImage(chromyListImages[i]), fit: BoxFit.fill)
-                                  ),
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width / 2 + 60,
-                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    gradient: LinearGradient(
-                                      colors: [Colors.transparent, Colors.black45],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter
-                                    )
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 12.0, bottom: 12.0),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(chromyListImagesInfo[i], style: TextStyle(color: Colors.white70),)
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              ],
-                            );
-                          },
-                        );
-                      }).toList()
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                  )
+                ],
+              )
+            ],
           ),
-          Consumer<ArtistProviderState>(
-            builder: (context, data, _) {
-              print("Data" + data.toString());
-
-              return  Center(child: ProgressAnimation2());
-            },
-          )
-        ],
-      ),
-    );
+        ),
+      );
+    } else {
+      return MyApp();
+    }
   }
 
-  Widget _renderArtistImageListView() {
-    return Container(
-      height: 150,
-      child: ListView.builder(
-        itemCount: 5,
-        padding: EdgeInsets.only(left: 16.0),
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) => _renderItems(context, index),
-      ),
-    );
+  Future<String> _decryptTensorflowModel() async {
+    var res = await platform
+        .invokeMethod("decryptTensorflowModel", {"decrypt": "decrypt"});
+    return res;
   }
 
-  Widget _renderItems(BuildContext context, int index) {
-    return GestureDetector(
-      onTap: () {
+  Future<String> _checkPermission() async {
+    var res = await platform
+        .invokeMethod('checkStoragePermission', {"check": "check"});
+    return res;
+  }
 
-      },
-      child: Container(
-        margin: EdgeInsets.only(right: 20.0),
-        width: 150,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15.0),
-            image: DecorationImage(
-              image: AssetImage("assets/artist/paint.jpg"),
-              fit: BoxFit.cover
+  Future<String> _isFirstTimeAndPermission() async {
+
+    // implementing the below with the native code
+
+    var firstTime = await platform.invokeMethod("isFirstTimeAndCheckPermission", {"firstpermission": "firstpermission"});
+    return firstTime;
+
+    /*
+    bool firstTime;
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    bool notFirst = _preferences.getBool('first') ?? false;
+    if (notFirst) {
+      print("not first time");
+      firstTime = false;
+    } else {
+      print('firstTime');
+      firstTime = true;
+    }
+    return firstTime; */
+  }
+
+  Future<String> _setTheInitFlag() async {
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    await _preferences.setBool('first', true);
+    await _preferences.commit();
+    return "done";
+  }
+}
+
+class Page1 extends StatefulWidget {
+  @override
+  _Page1State createState() => _Page1State();
+}
+
+class _Page1State extends State<Page1> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(Icons.photo_filter, size: 100.0, color: Colors.black),
+            Text(
+              "BOKEHFY APP",
+              style: TextStyle(fontSize: 17.0, color: Colors.black),
             )
-          ),
-          height: 150,
-        )
+          ],
+        ),
       ),
     );
   }
 }
 
-var cardAspectRatio = 12.0 / 16.0;
-var widgetAspectratio = cardAspectRatio * 1.19;
+class Page2 extends StatefulWidget {
+  @override
+  _Page2State createState() => _Page2State();
+}
 
-class CardScrollWidget extends StatelessWidget {
+class _Page2State extends State<Page2> {
+  static final platform = MethodChannel("CHANNEL_BOKEHFY");
 
-  var currentPage;
-  var padding = 20.0;
-  var verticalInset = 20.0;
-
-  var numberOfPaintImages = artistImagesList.length;
-  CardScrollWidget(this.currentPage);
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: widgetAspectratio,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          var width = constraints.maxWidth;
-          var height = constraints.maxHeight;
-
-          var safeWidth = width - 2 * padding;
-          var safeHeight = height - 2 * padding;
-
-          var heightOfPrimaryCard = safeHeight;
-          var widthOfPrimaryCard = heightOfPrimaryCard * cardAspectRatio;
-
-          var primaryCardLeft = safeWidth - widthOfPrimaryCard;
-          var horizontalInset = primaryCardLeft / 2;
-
-
-          List<Widget> cardList = List();
-
-          for (var i=0; i < numberOfPaintImages;  i++) {
-            var delta = i - currentPage;
-            bool isOnRight = delta > 0;
-
-            var start = padding + max(primaryCardLeft - horizontalInset * -delta * (isOnRight ? 15 : 1), 0.0);
-            
-            var image;
-            if(i%2 == 0) {
-              image = DecorationImage(image: ExactAssetImage("assets/artist/paint.jpg"), fit: BoxFit.cover);
-            } else {
-              image = DecorationImage(image: ExactAssetImage("assets/artist/notre.jpg"), fit: BoxFit.cover);
-            }
-
-            var cardItem = Positioned.directional(
-              top: padding + verticalInset * max(-delta, 0.0),
-              bottom: padding * verticalInset * max(-delta, 0.0),
-              start: start,
-              textDirection:  TextDirection.rtl,
-              child: Hero(
-                tag: "artist_$i",
-                child: AspectRatio(
-                  aspectRatio: cardAspectRatio,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: <Widget>[
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                          image: DecorationImage(
-                            image: ExactAssetImage(artistImagesList[i]),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                          gradient: LinearGradient(
-                            colors: [Colors.transparent, Colors.black54],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(Icons.supervisor_account, size: 100.0, color: Colors.black),
+            Text(
+              "Magically convert to Portrait photos with AI",
+              style: TextStyle(
+                fontSize: 17.0,
+                color: Colors.black,
               ),
-            );
-            cardList.add(cardItem); 
-          }
+            ),
+            RaisedButton(
+              child: Text(
+                "Give Permission",
+                style: TextStyle(color: Colors.black),
+              ),
+              elevation: 5.0,
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Storage Permission"),
+                        content: Text(
+                            "We need storage permission to be able to write images to disk"),
+                        actions: <Widget>[
+                          MaterialButton(
+                            child: Text("No"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          RaisedButton(
+                            child: Text(
+                              "Yes",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onPressed: () {
+                              _getStoragePermission();
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      );
+                    });
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
 
-          return Stack(
-            children: cardList,
-          );
-        },
+  Future<String> _getStoragePermission() async {
+    var res = await platform
+        .invokeMethod("getStoragePermission", {"permission": "permission"});
+    return res;
+  }
+}
+
+class Page3 extends StatefulWidget {
+  @override
+  _Page3State createState() => _Page3State();
+}
+
+class _Page3State extends State<Page3> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(Icons.face, size: 100.0, color: Colors.black),
+            Text(
+              "Happy Bokehfying!!!",
+              style: TextStyle(fontSize: 17.0, color: Colors.black),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -32,7 +32,7 @@ class _ChromyImageViewerState extends State<ChromyImageViewer> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text("Chromy Images"),
+        title: Text("Mono Images"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.share),
