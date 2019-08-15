@@ -1,6 +1,10 @@
 package com.aiportraitapp.jayanthl.bokehfyapp
 
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.util.Log
+import android.content.Context
+import android.widget.Toast
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -160,6 +164,49 @@ class MainActivity: FlutterActivity() {
                 } catch(e: Exception) {
                     result.success("failure")
                 }
+            }
+
+            else if(methodCall.method.equals("getStoragePermission")) {
+                if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1001)
+                }
+                this.pendingIntentnResult = result
+            } else if(methodCall.method.equals("checkStoragePermission")) {
+                if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    result.success("true")
+                } else {
+                    result.success("false")
+                    Toast.makeText(this, "Please provide storage permission to be able to save photos", Toast.LENGTH_LONG).show()
+                }
+            }
+
+             else if(methodCall.method.equals("isFirstTimeAndCheckPermission")) {
+                var firstTime: Boolean
+                var isPermissionNotGranted: Boolean
+                val sharedPreferences = getSharedPreferences(packageName, Context.MODE_PRIVATE)
+                val notFirst = sharedPreferences.getBoolean("first", false)
+                if(notFirst) {
+                    Log.i("Init.this", "Not first time")
+                    firstTime = false
+                } else {
+                    Log.i("Init.this", "First Time")
+                    sharedPreferences.edit().putBoolean("first", true).commit()
+                    firstTime = true
+                }
+                if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    isPermissionNotGranted = true
+                } else {
+                    isPermissionNotGranted = false
+                }
+
+                var finalStartUpResult: String = ""
+                if(firstTime || isPermissionNotGranted) {
+                    finalStartUpResult = "true"
+                } else {
+                    finalStartUpResult = "false"
+                }
+
+                result.success(finalStartUpResult)
             }
         }
     }

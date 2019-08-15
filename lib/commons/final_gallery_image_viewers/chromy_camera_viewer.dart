@@ -31,7 +31,7 @@ class _ChromyCameraViewerState extends State<ChromyCameraViewer> {
     return Scaffold(
        appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text("Chromy Images"),
+        title: Text("Mono Images"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.share),
