@@ -98,7 +98,7 @@ class _IntroSliderState extends State<IntroSlider> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end, 
                 children: <Widget>[
                   MaterialButton(
                     child: Icon(Icons.arrow_back_ios),
