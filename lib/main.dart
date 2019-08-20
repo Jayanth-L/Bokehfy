@@ -1,5 +1,7 @@
  
+import 'package:bokehfyapp/providers/artist_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
@@ -14,11 +16,18 @@ void main() => runApp(MyBokehfyApp());
 class MyBokehfyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Intro slider",
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Raleway"),
-      home: IntroSlider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          builder: (BuildContext context) => ArtistProviderState(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Raleway"),
+        darkTheme: ThemeData.light(),
+        home: IntroSlider()
+      ),
     );
   }
 }
@@ -89,7 +98,7 @@ class _IntroSliderState extends State<IntroSlider> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end, 
                 children: <Widget>[
                   MaterialButton(
                     child: Icon(Icons.arrow_back_ios),
@@ -149,7 +158,7 @@ class _IntroSliderState extends State<IntroSlider> {
                                       Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                               builder: (BuildContext context) =>
-                                                  MyApp()));
+                                                  MainPage()));
                           });
                         }
                         print("Pressed");
@@ -163,7 +172,7 @@ class _IntroSliderState extends State<IntroSlider> {
         ),
       );
     } else {
-      return MyApp();
+      return MainPage();
     }
   }
 
